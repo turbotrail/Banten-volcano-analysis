@@ -19,11 +19,11 @@ def main():
         config = json.load(f)
         
     now = datetime.now()
-    yesterday = now - timedelta(days=1)
+    start_date = now - timedelta(days=2)
     
     # Update search parameters
     config["search_parameters"]["datasetId"] = "3RIMG_L1B_STD"
-    config["search_parameters"]["startTime"] = yesterday.strftime("%Y-%m-%d")
+    config["search_parameters"]["startTime"] = start_date.strftime("%Y-%m-%d")
     config["search_parameters"]["endTime"] = now.strftime("%Y-%m-%d")
     
     # Enable automatic download
