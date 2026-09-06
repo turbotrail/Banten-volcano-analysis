@@ -35,9 +35,16 @@ def main():
     print(f"Updated config.json to download 3RIMG_L1B_STD from {config['search_parameters']['startTime']} to {config['search_parameters']['endTime']}.")
     print(f"Download location: {config['download_settings']['download_path']}")
     
-    # Run the mdapi.py script
-    print("Running mdapi.py...")
-    subprocess.run([sys.executable, "-u", "mdapi.py"])
-
+    # Run the mdapi.py script in a robust restart loop
+    while True:
+        print("Running mdapi.py...")
+        result = subprocess.run([sys.executable, "-u", "mdapi.py"])
+        
+        if result.returncode == 0:
+            print("\nAll downloads completed successfully!")
+            break
+        else:
+            print(f"\n[!] mdapi.py exited with code {result.returncode}. Restarting the download immediately...")
+            
 if __name__ == "__main__":
     main()

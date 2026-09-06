@@ -38,8 +38,23 @@ def create_video(fps=5):
         print("No HDF5 files found!")
         return
 
-    h5_files.sort()
-    print(f"Found {len(h5_files)} HDF5 files.")
+    from datetime import datetime
+    
+    def get_file_time(filepath):
+        # Extract the date and time from filenames like: 3RIMG_06SEP2026_0945_L1B_STD_V01R00.h5
+        basename = os.path.basename(filepath)
+        parts = basename.split("_")
+        if len(parts) >= 3:
+            date_time_str = parts[1] + "_" + parts[2]
+            try:
+                return datetime.strptime(date_time_str, "%d%b%Y_%H%M")
+            except ValueError:
+                pass
+        # Fallback to file creation time if parsing fails
+        return datetime.fromtimestamp(os.path.getctime(filepath))
+
+    h5_files.sort(key=get_file_time)
+    print(f"Found {len(h5_files)} HDF5 files. Sorted chronologically.")
     
     output_filename = "swir_timelapse.mp4"
     writer = imageio.get_writer(output_filename, fps=fps)
@@ -52,9 +67,12 @@ def create_video(fps=5):
                     print(f"No IMG_SWIR dataset found in {os.path.basename(file_path)}")
                     continue
                 
-                # The shape is (1, 11264, 11220). Read every 8th pixel to downsample 
-                # directly from disk to avoid memory and buffer issues.
-                data = f['IMG_SWIR'][0, ::8, ::8]
+                # Read specifically the Banten volcano region (approx 6°S, 105°E)
+                # Instead of downsampling the full disk, we crop the specific area at 1:1 resolution
+                # to maximize the visible detail of the volcano.
+                # SWIR indices for Banten region: y ~ 6168 to 6432, x ~ 8724 to 8952
+                # We add some padding for a nice 600x600 context window
+                data = f['IMG_SWIR'][0, 6000:6600, 8500:9100]
                 
                 data_f = data.astype(np.float32)
                 

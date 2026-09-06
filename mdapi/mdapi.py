@@ -667,9 +667,8 @@ def refresh_access_token(refresh_token):
             response = requests.post(refresh_url, json=data)
 
             if response.status_code == 429:
-                print(f"\n[WARNING] Too Many Requests (429) at Token Refresh. Retrying in 20 seconds... (Attempt {attempt+1}/3)")
-                time.sleep(20)
-                continue
+                print(f"\n[WARNING] Too Many Requests (429) at Token Refresh. Forcing wrapper restart...")
+                return None
 
             if response.status_code == 400:
                 resp = response.json()
@@ -778,8 +777,12 @@ def main():
             print(f"Total Time Taken: {total_minutes:.2f} min")
         else:
             print(f"Total Time Taken: {total_time:.2f} sec")
-    
-    logout()
+            
+        logout()
+    else:
+        print(f"\n{RED}Download interrupted or failed to complete.{RESET}")
+        logout()
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
