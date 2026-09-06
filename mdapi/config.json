@@ -1,0 +1,21 @@
+{
+    "user_credentials": {
+        "username/email": "test",
+        "password": "test"
+    },
+    "search_parameters": {
+        "datasetId": "3RIMG_L1B_STD",
+        "startTime": "2026-09-05",
+        "endTime": "2026-09-06",
+        "count": "",
+        "boundingBox": "",
+        "gId": ""
+    },
+    "download_settings": {
+        "download_path": "/Volumes/Expansion/banten_volcano",
+        "organize_by_date": false,
+        "skip_user_input": true,
+        "generate_error_logs": true,
+        "error_logs_dir": ""
+    }
+}
