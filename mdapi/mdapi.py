@@ -662,24 +662,31 @@ def download_data(bearer_token, record_id, identifier, prod_date, counter, total
 def refresh_access_token(refresh_token):
     data = {"refresh_token": refresh_token}
 
-    try:
-        response = requests.post(refresh_url, json=data)
+    for attempt in range(3):
+        try:
+            response = requests.post(refresh_url, json=data)
 
-        if response.status_code == 400:
-            resp = response.json()
-            err_msg = resp['error']
-            print(f"\n[ERROR] Validation Error: {err_msg}\n")
+            if response.status_code == 429:
+                print(f"\n[WARNING] Too Many Requests (429) at Token Refresh. Retrying in 20 seconds... (Attempt {attempt+1}/3)")
+                time.sleep(20)
+                continue
+
+            if response.status_code == 400:
+                resp = response.json()
+                err_msg = resp['error']
+                print(f"\n[ERROR] Validation Error: {err_msg}\n")
+                if generate_logs:
+                    logger.error(f"There was an Error encountered regarding the Validation of Refresh Token.\nError Details: {err_msg}\nSolution: Please make sure the Refresh Token is not Tampered or modified before passing in the download_data() method.")
+                return None
+
+            response.raise_for_status() 
+            return response.json() 
+        except requests.exceptions.RequestException as e:
+            print(f"[ERROR] Invalid Token. Please Login and Try Again.\nError Details: {e}")
             if generate_logs:
-                logger.error(f"There was an Error encountered regarding the Validation of Refresh Token.\nError Details: {err_msg}\nSolution: Please make sure the Refresh Token is not Tampered or modified before passing in the download_data() method.")
-            return
-
-        response.raise_for_status() 
-        return response.json() 
-    except requests.exceptions.RequestException as e:
-        print(f"[ERROR] Invalid Token. Please Login and Try Again.\nError Details: {e}")
-        if generate_logs:
-            logger.error("[ERROR] Invalid Token Error encountered. Please Login Successfully and Try Again.\nError Details: ", exc_info=True)
-        return None
+                logger.error("[ERROR] Invalid Token Error encountered. Please Login Successfully and Try Again.\nError Details: ", exc_info=True)
+            return None
+    return None
 
 def logout():
     data = {"username":username} 
