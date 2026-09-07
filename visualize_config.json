@@ -1,0 +1,23 @@
+{
+    "regions": {
+        "banten": {
+            "description": "Banten Volcano / Sunda Strait (Java, Indonesia)",
+            "y_min_1km": 6000,
+            "y_max_1km": 6600,
+            "x_min_1km": 8500,
+            "x_max_1km": 9100,
+            "target_resolution": [600, 600]
+        },
+        "full_disk": {
+            "description": "Full Earth Disk",
+            "y_min_1km": 0,
+            "y_max_1km": 11264,
+            "x_min_1km": 0,
+            "x_max_1km": 11220,
+            "target_resolution": [1024, 1024]
+        }
+    },
+    "grid_settings": {
+        "channels": ["IMG_VIS", "IMG_SWIR", "IMG_MIR", "IMG_TIR1"]
+    }
+}
